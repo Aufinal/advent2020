@@ -30,6 +30,3 @@ println("Valid passwords : $(check_count("input-02", is_valid_count))")
 # Problem 2
 
 println("Valid passwords : $(check_count("input-02", is_valid_xor))")
-
-
-
