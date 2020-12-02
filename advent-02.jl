@@ -1,38 +1,35 @@
-function parse_rule(rule)
+function parse_line(line)
     regex = r"(\d+)-(\d+) (\w): (\w+)"
-    m = match(regex, rule)
+    m = match(regex, line)
 
-    num1 = parse(Int, m[1])
-    num2 = parse(Int, m[2])
+    min = parse(Int, m[1])
+    max = parse(Int, m[2])
     char = first(m[3])
     
-    return num1, num2, char, m[4]
+    return m[4], char, min, max
+end
+
+function is_valid_count((password, char, min, max))
+    return min <= count(i -> (i == char), password) <= max
+end
+
+function is_valid_xor((password, char, min, max))
+    return (password[min] == char) ⊻ (password[max] == char)
+end
+
+function check_count(filename, check_fun)
+    open(filename) do file
+        return count(check_fun ∘ parse_line, readlines(file))
+    end
 end
 
 # Problem 1
 
-open("input-02") do file
-    n_valid = 0
-    for line in readlines(file)
-        min_num, max_num, char, str = parse_rule(line)
-        c = count(i -> (i == char), str)
-        if min_num <= c <= max_num
-            n_valid += 1
-        end
-    end
-    println("Valid passwords : $n_valid")
-end
+println("Valid passwords : $(check_count("input-02", is_valid_count))")
 
 # Problem 2
 
-open("input-02") do file
-    n_valid = 0
-    for line in readlines(file)
-        a, b, char, str = parse_rule(line)
-        if (str[a] == char) ⊻ (str[b] == char)
-            n_valid += 1
-        end
-    end
-    println("Valid passwords : $n_valid")
-end
+println("Valid passwords : $(check_count("input-02", is_valid_xor))")
+
+
 
