@@ -1,13 +1,12 @@
 function parse_rule(rule)
     regex = r"(\d+)-(\d+) (\w): (\w+)"
     m = match(regex, rule)
-    cap = m.captures
 
-    num1 = parse(Int, cap[1])
-    num2 = parse(Int, cap[2])
-    char = first(cap[3])
+    num1 = parse(Int, m[1])
+    num2 = parse(Int, m[2])
+    char = first(m[3])
     
-    return num1, num2, char, cap[4]
+    return num1, num2, char, m[4]
 end
 
 # Problem 1
