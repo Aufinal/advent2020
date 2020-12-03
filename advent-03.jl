@@ -1,16 +1,11 @@
-function parse_line(line)
-    return [char == '#' ? 1 : 0 for char in line]
-end
-
 function parse_file(filename)
     open(filename) do file
-        return hcat(map(parse_line, eachline(file))...)
+        return hcat(map(line -> map(char -> char == '#', collect(line)), eachline(file))...)
     end
 end
 
 function toboggan(sapins, (dx, dy))
-    (m, n) = size(sapins)
-    return sum(sapins[1 + (k * dx) % m, 1 + (k * dy)] for k in 1:((n - 1) ÷ dy))
+    return sum(sapins[1 + (k * dx) % size(sapins, 1), 1 + (k * dy)] for k in 1:((size(sapins, 2) - 1) ÷ dy))
 end
 
 sapins = parse_file("input-03")
