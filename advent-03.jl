@@ -4,7 +4,7 @@ end
 
 function parse_file(filename)
     open(filename) do file
-        return hcat([parse_line(line) for line in readlines(file)]...)
+        return hcat(map(parse_line, eachline(file))...)
     end
 end
 
