@@ -30,9 +30,9 @@ end
 function tweak(program)
     for i in 1:length(program)
         if program[i][1] ∈ ["jmp", "nop"]
-            p_copy = deepcopy(program)
-            p_copy[i][1] = program[i][1] == "jmp" ? "nop" : "jmp"
-            success, acc = execute(p_copy)
+            program[i][1] = program[i][1] == "jmp" ? "nop" : "jmp"
+            success, acc = execute(program)
+            program[i][1] = program[i][1] == "jmp" ? "nop" : "jmp"
             if success
                 return acc
             end
