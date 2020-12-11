@@ -10,28 +10,12 @@ function diffs(int_list)
 end
 
 function combinations(int_list)
-    result = 1
-    curr = 0
-    run = 0
-    n = length(int_list)
-    comb::Array{Int} = zeros(n)
-    comb[1] = 1
-    comb[2] = 1
-    comb[3] = 2
-    for i in 4:n
-        comb[i] = comb[i - 1] + comb[i - 2] + comb[i - 3]
-    end
+    comb = Dict{Int,Int}()
+    comb[0] = 1
     for i in int_list
-        if i == curr + 3
-            result *= comb[run + 1]
-            run = 0
-        else
-            run += 1
-        end
-        curr = i
+        comb[i] = get(comb, i - 1, 0) + get(comb, i - 2, 0) + get(comb, i - 3, 0)
     end
-    result *= comb[run + 1] 
-    return result
+    return comb[int_list[end]]
 end
 
 function parse_file(file)
