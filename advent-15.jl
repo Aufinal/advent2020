@@ -1,13 +1,13 @@
 function run_game(numbers::Array{UInt32,1}, n_steps::Int)
-    last_spoken = Dict{UInt32,UInt32}()
+    last_spoken = zeros(UInt32, n_steps)
 
     for (i, n) in enumerate(numbers)
-        last_spoken[n] = i
+        last_spoken[n + 1] = i
     end
 
     spoken = 0
     for turn_number in 1 + length(numbers):n_steps - 1
-        last_spoken[spoken], spoken = turn_number, turn_number - get(last_spoken, spoken, turn_number)
+        last_spoken[spoken + 1], spoken = turn_number, turn_number - (last_spoken[spoken + 1] == 0 ? turn_number : last_spoken[spoken + 1])
     end
 
     return spoken
