@@ -1,36 +1,44 @@
-function run_once(
-    A::Array{Int8, 3},
-    (x_begin, y_begin, z_begin)::Tuple{Int8, Int8, Int8},
-    (x_end, y_end, z_end)::Tuple{Int8, Int8, Int8}
-    
-    )
-    kernel = ones(Int8, 3, 3, 3)
-    kernel[2, 2, 2] = zero(Int8)
-    for x in x_begin:x_end
-        for y in y_begin:y_end
-            for z in z_begin:z_end
-                @nloops 3 i kernel begin
-                    A[x + i_1] += (@nref 2 occupied d -> (x_d + i_d - 1)) * (@nref 2 kernel i)
-                end
-            end
+function run_once!(input::Array{Int8,N}, inter::Array{Int8,N}, offset::Int, bounds::NTuple{N,Int}) where N
+    I1 = oneunit(CartesianIndex{N})
+    for I in CartesianIndices(bounds)
+        J = I + offset * I1
+        for K in -I1:I1
+            inter[J + K] += input[J]
+        end
+        inter[J] -= input[J]
+    end
+
+    for I in CartesianIndices(bounds .+ 2)
+        J = I + (offset - 1) * I1
+        if (input[J] == 0 && inter[J] == 3) || (input[J] == 1 && 2 <= inter[J] <= 3)
+            input[J] = 1
+        else
+            input[J] = 0
         end
     end
-        
-
-
 end
 
-function run_n(initial::Array{Int8, 2}, n_steps)
+function make_tuple(x, y, z, n::Int)
+    return tuple(x, y, fill(z, n - 2)...)
+end 
+
+function run(initial::Array{Int8,2}, n_dims, n_steps)
     x, y = size(initial)
-    nx, ny, nz = x + 2n_steps, y + 2n_steps, 1 + 2n_steps
-    B = zeros(Int8, nx, ny ,nz)
-    B[n_steps+1:n_steps+x, n_steps+1:n_steps+y, n_steps + 1] = initial
+    dims = make_tuple(x + 2n_steps, y + 2n_steps, 1 + 2n_steps, n_dims)
+    B = zeros(Int8, dims)
+    n_neighbors = zeros(Int8, dims)
+    B[make_tuple((n_steps + 1):(n_steps + x), (n_steps + 1):(n_steps + y), n_steps + 1, n_dims)...] = initial
 
-    display(B)
+    for i in 0:(n_steps - 1)
+        fill!(n_neighbors, zero(Int8))
+        run_once!(B, n_neighbors, n_steps - i, make_tuple(x + 2i, y + 2i, 1 + 2i, n_dims))
+    end
+    return sum(B)
 end
 
 
-open("example-17") do file
-    initial::Array{Int8, 2} = hcat([[c == '.' ? 0 : 1 for c in line] for line in eachline(file)]...)
-    run_n(initial, 1)
+open("input-17") do file
+    initial::Array{Int8,2} = transpose(hcat([[c == '.' ? 0 : 1 for c in line] for line in eachline(file)]...))
+    println(run(initial, 3, 6))
+    @time println(run(initial, 4, 6))
 end
