@@ -13,12 +13,10 @@ open("input-16") do file
             push!(departure, n_fields)
         end
         matched = match(regex, line)
-        push!(conditions, tuple(
-            map(x -> parse(Int, x), matched.captures)...
-        ))
+        push!(conditions, tuple(parse.(Int, matched.captures)...))
     end
     readline(file)
-    ticket = [parse(Int, x) for x in split(readline(file), ",")]
+    ticket = parse.(Int, split(readline(file), ","))
 
     readline(file)
     readline(file)
@@ -26,8 +24,8 @@ open("input-16") do file
     sum_invalid = 0
     possible = ones(Int, n_fields, n_fields)
     for line in eachline(file)
-        fields = [parse(Int, x) for x in split(line, ",")]
-        invalid_fields = sum(field for field in fields if all(!test_bounds(b, field) for b in conditions))
+        fields = parse.(Int, split(line, ","))
+        invalid_fields = sum(field for field in fields if !any(test_bounds.(conditions, field)))
         sum_invalid += invalid_fields
         if invalid_fields == 0
             for (i, field) in enumerate(fields)
@@ -39,6 +37,7 @@ open("input-16") do file
             end
         end
     end
+    println(sum_invalid)
 
     rowsums = possible * ones(Int, n_fields)
     colsums = possible' * ones(Int, n_fields)
@@ -46,7 +45,5 @@ open("input-16") do file
     for i in 1:n_fields
         matching[i] = findfirst(isequal(n_fields + 1 - colsums[i]), rowsums)
     end
-    println(invalid_fields)
     println(join(ticket[matching[departure]], "*"))
-    
 end
