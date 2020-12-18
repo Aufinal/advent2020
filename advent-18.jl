@@ -1,6 +1,6 @@
 ⊗, ⊕ = +, *
 open("input-18") do file
-    lines = readlines(file)
-    println(sum(map(eval ∘ Meta.parse, replace.(lines, "*" => "⊕"))))
-    println(sum(map(eval ∘ Meta.parse, replace.(lines, "*" => "⊕", "+" => "⊗"))))
+    lines = replace.(readlines(file), "*" => "⊕")
+    @time println(sum(map(eval ∘ Meta.parse, lines)))
+    @time println(sum(map(eval ∘ Meta.parse, replace.(lines, "+" => "⊗"))))
 end
