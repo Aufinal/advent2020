@@ -1,4 +1,5 @@
 from ast import parse, walk, BinOp, Mult, Sub, BitOr
+import time
 
 
 def mod_expr(expr, token, opclass):
@@ -13,5 +14,7 @@ def mod_expr(expr, token, opclass):
 
 with open("input-18", "r") as f:
     lines = f.readlines()
+    t = time.time()
     print(sum(mod_expr(line, "-", Sub) for line in lines))
     print(sum(mod_expr(line, "|", BitOr) for line in lines))
+    print(time.time() - t)

@@ -1,4 +1,5 @@
 from lark import Lark, Transformer, v_args
+import time
 
 grammar1 = """
     ?start: expr
@@ -46,5 +47,9 @@ parser2 = Lark(grammar2, parser="lalr", transformer=CalcTree())
 calc1 = parser1.parse
 calc2 = parser2.parse
 
-print(sum(calc1(expr) for expr in open("input-18", "r").readlines()))
-print(sum(calc2(expr) for expr in open("input-18", "r").readlines()))
+with open("input-18", "r") as f:
+    lines = f.readlines()
+    t = time.time()
+    print(sum(calc1(expr) for expr in lines))
+    print(sum(calc2(expr) for expr in lines))
+    print(time.time() - t)
